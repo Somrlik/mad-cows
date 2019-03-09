@@ -1,0 +1,6 @@
+{
+  "ignore": ["**/*.test.ts", "**/*.spec.ts", ".git", "node_modules", "src/client/*"],
+  "watch": ["src", "webpack.config.js", "tsconfig.json", "tslint.json"],
+  "exec": "yarn lint && yarn start",
+  "ext": "ts"
+}
