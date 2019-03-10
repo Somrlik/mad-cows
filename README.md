@@ -21,6 +21,22 @@ $ yarn run build # Builds everything into ./dist
 $ NODE_ENV=production ./dist/server.js # Runs production level server 
 ```
 
+Running in docker
+-----------------
+
+Docker is cool I guess, so I included a Dockerfile.
+
+The image is quite huge, but the layering should be
+fine. 
+
+For those versed in docker, ignore the next lines, 
+because I am not that great in docker and I forget.
+
+```sh
+$ docker build -t mad-cowz .
+$ docker run -p 49160:8080 -d mad-cowz
+```
+
 CLI arguments
 -------------
 
@@ -46,9 +62,9 @@ and recompile.
 TODO
 ----
 
-- [ ] Rudimentary rendering using canvas
+- [x] Rudimentary rendering using canvas
 - [ ] Rudimentary collision detection
-- [ ] Rudimentary physics engine
+- [x] Rudimentary physics engine
 - [ ] Local multi-player
 - [ ] Clean up dependencies
 - [ ] Improvements over rudimentary implementations

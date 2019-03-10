@@ -1,65 +1,78 @@
+import { GameState, Input, Player } from './GameState';
+import Victor = require('victor');
+
 const body = document.getElementsByTagName('body')[0];
 let canvas = document.getElementsByTagName('canvas')[0];
 canvas = canvas || document.createElement('canvas');
 
-if (module.hot) {
-    module.hot.accept();
-    // TODO: Cull objects on rendering hot-reload
-    startRendering(body, canvas);
-}
-
 window.onload = () => {
-    startRendering(body, canvas);
+    body.setAttribute('style', 'margin: 0; padding: 2.5vh, 2.5vw; width: 100vw; overflow: none');
+    canvas.setAttribute('style', 'max-width: 1600px; max-height: 900px;');
+    canvas.setAttribute('width', body.clientWidth + 'px');
+    canvas.setAttribute('height', body.clientWidth * 9/16 + 'px');
+    body.appendChild(canvas);
 };
 
-function startRendering(body: HTMLBodyElement, canvas: HTMLCanvasElement) {
-    body.setAttribute('style', 'margin: 0; padding: 2.5vh, 2.5vw; width: 95vw; height: 95vh; overflow: none');
-    canvas.setAttribute('width', body.clientWidth + 'px');
-    canvas.setAttribute('height', body.clientHeight + 'px');
-    body.appendChild(canvas);
+/**
+ * Renders the game
+ *
+ * It is capable of rendering any
+ */
+class Renderer {
+    private game: GameState;
+    private canvas: HTMLCanvasElement;
+    private readonly ctx: CanvasRenderingContext2D;
 
-    let context2D = canvas.getContext("2d");
-    let square = {
-        x: 25,
-        y: 25,
-        directionX: -1,
-        directionY: 1,
-        speed: 2,
-        width: 50,
-        height: 50,
-        color: 'red',
-    };
+    /**
+     * Describes how the game coordinates should transform to view
+     */
+    private viewTransform: Victor;
 
-    function mainLoop() {
-        move();
-        draw();
-        requestAnimationFrame(mainLoop);
-    }
-    mainLoop();
-
-    function move() {
-        if (square.x + square.width + square.speed * square.directionX > canvas.width)
-            square.directionX = -1;
-        if (square.x + square.speed * square.directionX < 0)
-            square.directionX = 1;
-        if (square.y + square.height + square.speed * square.directionY > canvas.height)
-            square.directionY = -1;
-        if (square.y + square.speed * square.directionY < 0)
-            square.directionY = 1;
-
-        changeToRandomColor();
-        square.x += square.speed * square.directionX;
-        square.y += square.speed * square.directionY;
+    public constructor(game: GameState, canvas: HTMLCanvasElement) {
+        this.game = game;
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
     }
 
-    function draw() {
-        context2D.fillStyle = square.color;
-        context2D.fillRect(square.x, square.y, square.width, square.height);
-    }
+    public draw() {
+        this.viewTransform = new Victor(
+            game.fieldXSize / this.canvas.width,
+            game.fieldYSize / this.canvas.height
+        );
 
-    function changeToRandomColor() {
-        const colors = ['green', 'blue', 'red', 'yellow'];
-        square.color = colors[Math.floor(Math.random() * colors.length)];
+        // Clear the whole display
+        //this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        game.entities.forEach((entity) => {
+            entity.draw(this.viewTransform, this.ctx);
+        });
     }
+}
+const input = new Input(document.getElementsByTagName('html')[0]);
 
+// The underlying gameState is actually a smaller field. This does not really matter since I use floats to keep the state.
+// This is basically the global plane, renderer uses the display/rotation plane
+let game = new GameState(1600, 900, input);
+let renderer = new Renderer(game, canvas);
+
+// TODO: Move elsewhere
+let player = new Player(game, new Victor(500, 50), 0.0);
+game.addPlayer(player);
+
+let lastTick = performance.now();
+function mainLoop() {
+    const delta = (performance.now() - lastTick) / 1000.0;
+
+    game.tick(delta);
+    renderer.draw();
+
+    requestAnimationFrame(mainLoop);
+    lastTick = performance.now();
+}
+mainLoop();
+
+if (module.hot) {
+    module.hot.accept([], () => {
+        // TODO: I am too lazy to do stuff with the state, so I just reload the window
+        window.location = window.location;
+    });
 }
