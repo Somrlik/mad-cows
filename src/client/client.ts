@@ -41,7 +41,7 @@ class Renderer {
         );
 
         // Clear the whole display
-        //this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         game.entities.forEach((entity) => {
             entity.draw(this.viewTransform, this.ctx);
         });

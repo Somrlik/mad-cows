@@ -111,7 +111,7 @@ class Entity {
     }
 }
 
-const INHERENT_DECELERATION = - 3;
+const INHERENT_DECELERATION = -30;
 const MAX_SPEED = 65;
 const TURNING_BIAS = 3;
 const ACCELERATION_BIAS = 30;
@@ -137,7 +137,7 @@ export class Player extends Entity {
         if (this.game.input.isUpActive) {
             acceleration = ACCELERATION_BIAS;
         } else if (this.game.input.isDownActive) {
-            acceleration = -ACCELERATION_BIAS;
+            acceleration = -ACCELERATION_BIAS - 30;
         } else {
             acceleration = INHERENT_DECELERATION;
         }
