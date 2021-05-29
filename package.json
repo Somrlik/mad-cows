@@ -53,6 +53,6 @@
     "webpack-hot-middleware": "^2.24.3",
     "websocket": "^1.0.28",
     "winston": "^3.2.1",
-    "ws": "^6.2.0"
+    "ws": "^7.4.6"
   }
 }
